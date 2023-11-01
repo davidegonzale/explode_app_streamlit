@@ -7,13 +7,14 @@ from io import BytesIO
 # Function to create a download link for the dataframe
 def get_excel_download_link(df, filename="transformed_data.xlsx"):
     output = BytesIO()
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, index=False, sheet_name='Sheet1')
-    writer.save()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:  # Using context manager
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
+        # No need to call writer.save() or writer.close() when using the context manager
+
     excel_data = output.getvalue()
     b64 = base64.b64encode(excel_data).decode()  # some strings <-> bytes conversions necessary here
     return f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">Download transformed Excel file</a>'
-
+    
 # Streamlit app
 st.title('Excel Column Exploder for Shintia bb')
 
@@ -39,7 +40,10 @@ if uploaded_file:
 
         # Explode the column
         df_exploded = df.assign(**{column_to_explode: df[column_to_explode].str.split(delimiter)}).explode(column_to_explode)
-        
+
+        # Trim leading and trailing spaces
+        df_exploded[column_to_explode] = df_exploded[column_to_explode].str.strip()
+
         st.write('First 5 rows of the transformed data:')
         st.dataframe(df_exploded.head())
 
