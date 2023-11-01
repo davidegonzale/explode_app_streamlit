@@ -16,7 +16,7 @@ def get_excel_download_link(df, filename="transformed_data.xlsx"):
     return f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">Download transformed Excel file</a>'
     
 # Streamlit app
-st.title('Excel Column Exploder for Shintia bb')
+st.title('Excel Column Exploder')
 
 # Upload the excel file
 uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
